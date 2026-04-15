@@ -1,0 +1,233 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --radius: 0.5rem;
+  --border: 213 31% 91%;
+  --input: 213 32% 91%;
+  --ring: 263 70% 50%;
+  --background: 210 40% 98%;
+  --foreground: 213 13% 23%;
+  
+  --primary: 79 70 229;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 213 13% 15%;
+  --secondary-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --muted: 213 14% 67%;
+  --muted-foreground: 213 12% 33%;
+  --accent: 245 158 11;
+  --accent-foreground: 213 13% 23%;
+}
+
+.dark {
+  --border: 213 14% 15%;
+  --input: 213 14% 15%;
+  --ring: 263 70% 50%;
+  --background: 213 14% 8%;
+  --foreground: 210 40% 98%;
+  
+  --primary: 79 70 229;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 213 13% 85%;
+  --secondary-foreground: 213 13% 15%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --muted: 213 14% 35%;
+  --muted-foreground: 213 10% 64%;
+  --accent: 245 158 11;
+  --accent-foreground: 213 13% 23%;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-background text-foreground;
+  font-feature-settings: "rounding-mode" 1;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-700 rounded-full hover:bg-gray-400 dark:hover:bg-gray-600;
+}
+
+/* Smooth transitions */
+@layer components {
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary-700 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-secondary-100 text-secondary-900 font-medium hover:bg-secondary-200 transition-smooth focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-secondary-700 font-medium hover:bg-secondary-100 transition-smooth focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-danger text-white font-medium hover:bg-danger-dark transition-smooth focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white dark:bg-secondary-800 rounded-xl border border-gray-200 dark:border-secondary-700 shadow-soft hover:shadow-medium transition-smooth;
+  }
+
+  .card-interactive {
+    @apply card cursor-pointer hover:scale-105;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-primary {
+    @apply badge bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300;
+  }
+
+  .badge-success {
+    @apply badge bg-success-light/20 text-success-dark;
+  }
+
+  .badge-warning {
+    @apply badge bg-warning-light/20 text-warning-dark;
+  }
+
+  .badge-danger {
+    @apply badge bg-danger-light/20 text-danger-dark;
+  }
+
+  /* Input styles */
+  .input-base {
+    @apply w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-secondary-600 bg-white dark:bg-secondary-800 text-foreground placeholder-gray-400 transition-smooth focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-primary bg-clip-text text-transparent;
+  }
+
+  /* Flex utilities */
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  /* Responsive container */
+  .container-responsive {
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Glass morphism */
+  .glass {
+    @apply backdrop-blur-md bg-white/30 dark:bg-black/30 border border-white/20;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+  }
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 5px rgba(79, 70, 229, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(79, 70, 229, 0.8);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Responsive images */
+img {
+  @apply max-w-full h-auto;
+}
+
+/* Focus states for accessibility */
+a:focus-visible,
+button:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2;
+}
+
+.dark a:focus-visible,
+.dark button:focus-visible {
+  @apply ring-offset-secondary-800;
+}
+
+/* Slide-in animation for side panels */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scale-in animation for modals */
+@keyframes scale-in {
+  from {
+    transform: scale(0.93);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

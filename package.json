@@ -1,0 +1,33 @@
+{
+  "name": "tasknest-pro",
+  "version": "2.0.0",
+  "description": "Professional Project Management & Team Collaboration Platform",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces",
+    "build": "npm run build --workspaces",
+    "start": "npm run start --workspaces",
+    "lint": "npm run lint --workspaces",
+    "type-check": "npm run type-check --workspaces",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:backend": "npm run build --workspace=backend"
+  },
+  "keywords": [
+    "project-management",
+    "collaboration",
+    "team",
+    "tasks",
+    "mern",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "TaskNest Team",
+  "license": "MIT"
+}
