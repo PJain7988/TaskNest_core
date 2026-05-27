@@ -12,14 +12,14 @@ const generateToken = (id: any) => {
 }
 
 export const register = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body
+  const { name, email, password, role } = req.body
 
   const userExists = await User.findOne({ email })
   if (userExists) {
     return res.status(400).json({ success: false, message: 'User already exists' })
   }
 
-  const user = await User.create({ name, email, password })
+  const user = await User.create({ name, email, password, role })
   if (user) {
     res.status(201).json({
       success: true,

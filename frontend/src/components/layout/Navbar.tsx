@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Menu, X, Bell, Search, Settings, LogOut, User } from 'lucide-react'
+import { Menu, Bell, Search, Settings, LogOut, User } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
 

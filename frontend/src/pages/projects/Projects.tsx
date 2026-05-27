@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, GitBranch, Users, Calendar, Trash2, Edit3, ExternalLink, Link, Tag, FolderOpen, Layers, Flag } from 'lucide-react'
+import { Plus, GitBranch, Users, Calendar, Trash2, Edit3, ExternalLink, Link, Tag, FolderOpen, Layers } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'

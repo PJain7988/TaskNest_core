@@ -9,7 +9,6 @@ import {
   LogOut,
   ChevronRight,
 } from 'lucide-react'
-import { useState } from 'react'
 
 interface SidebarProps {
   isOpen: boolean
@@ -34,7 +33,6 @@ import { useAuth } from '@/context/AuthContext'
 export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const { user, logout } = useAuth()
   const location = useLocation()
-  const [expandedMenu, setExpandedMenu] = useState<string | null>(null)
 
   const isActive = (path: string) => location.pathname === path
 

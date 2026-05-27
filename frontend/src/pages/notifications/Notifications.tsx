@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, CheckCircle, MessageSquare, Clock, Filter } from 'lucide-react'
+import { Bell, CheckCircle, MessageSquare, Clock } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface Notification {

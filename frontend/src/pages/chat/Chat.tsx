@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Send, Paperclip, Smile, Plus, Search, X, Users } from 'lucide-react'
-import { useAuth } from '@/context/AuthContext'
+import { Send, Paperclip, Plus, Search, X, Users } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/services/api'
@@ -12,7 +11,6 @@ const initialConversations = [
 ]
 
 export default function Chat() {
-  const { user } = useAuth()
   const location = useLocation()
   const [selectedConversation, setSelectedConversation] = useState(1)
   const [messageInput, setMessageInput] = useState('')
