@@ -3,6 +3,7 @@ import { Send, Paperclip, Plus, Search, X, Users } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/services/api'
+import { useTranslation } from '@/hooks/useTranslation'
 
 const initialConversations = [
   { id: 1, name: 'General', unread: 2, lastMessage: 'Hey team!' },
@@ -11,6 +12,7 @@ const initialConversations = [
 ]
 
 export default function Chat() {
+  const { t } = useTranslation()
   const location = useLocation()
   const [selectedConversation, setSelectedConversation] = useState(1)
   const [messageInput, setMessageInput] = useState('')
@@ -90,7 +92,7 @@ export default function Chat() {
       {/* Conversations Sidebar */}
       <div className="lg:col-span-1 card p-4 flex flex-col overflow-hidden">
         <div className="flex-between mb-4">
-          <h2 className="font-bold text-secondary-900 dark:text-white">Messages</h2>
+          <h2 className="font-bold text-secondary-900 dark:text-white">{t('messages')}</h2>
           <button 
             onClick={() => setIsNewChatModalOpen(true)}
             className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-smooth"
@@ -103,7 +105,7 @@ export default function Chat() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input 
             type="text" 
-            placeholder="Search chats..." 
+            placeholder={t('searchPlaceholder')} 
             className="input-base pl-10 text-sm py-2"
           />
         </div>
@@ -192,7 +194,7 @@ export default function Chat() {
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Type your message here..."
+              placeholder={t('todo') === 'Zu tun' ? 'Schreiben Sie Ihre Nachricht...' : t('todo') === 'À Faire' ? 'Tapez votre message...' : t('todo') === 'Por Hacer' ? 'Escribe tu mensaje...' : 'Type your message here...'}
               className="input-base flex-1 py-3"
             />
             <button
@@ -211,8 +213,8 @@ export default function Chat() {
           <div className="bg-white dark:bg-secondary-800 rounded-3xl shadow-2xl animate-scale-in w-full max-w-md">
             <div className="p-6 border-b border-gray-100 dark:border-secondary-700 flex-between">
               <div>
-                <h2 className="text-xl font-bold text-secondary-900 dark:text-white">New Message</h2>
-                <p className="text-sm text-gray-500">Select a team member to start a conversation</p>
+                <h2 className="text-xl font-bold text-secondary-900 dark:text-white">{t('todo') === 'Zu tun' ? 'Neue Nachricht' : t('todo') === 'À Faire' ? 'Nouveau Message' : t('todo') === 'Por Hacer' ? 'Nuevo Mensaje' : 'New Message'}</h2>
+                <p className="text-sm text-gray-500">{t('todo') === 'Zu tun' ? 'Wählen Sie ein Teammitglied' : t('todo') === 'À Faire' ? 'Sélectionnez un membre' : t('todo') === 'Por Hacer' ? 'Selecciona un miembro de equipo' : 'Select a team member to start a conversation'}</p>
               </div>
               <button
                 onClick={() => setIsNewChatModalOpen(false)}
@@ -227,7 +229,7 @@ export default function Chat() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search team members..."
+                  placeholder={t('searchPlaceholder')}
                   className="input-base pl-10 text-sm py-2"
                 />
               </div>
