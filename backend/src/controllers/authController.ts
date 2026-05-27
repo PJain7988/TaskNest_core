@@ -24,7 +24,16 @@ export const register = async (req: Request, res: Response) => {
     res.status(201).json({
       success: true,
       token: generateToken(user._id),
-      data: { id: user._id, name: user.name, email: user.email, role: user.role },
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        language: user.language,
+        appearanceSettings: user.appearanceSettings,
+        notificationSettings: user.notificationSettings,
+        twoFactorEnabled: user.twoFactorEnabled
+      },
     })
   } else {
     res.status(400).json({ success: false, message: 'Invalid user data' })
@@ -42,7 +51,16 @@ export const login = async (req: Request, res: Response) => {
     res.json({
       success: true,
       token: generateToken(user._id),
-      data: { id: user._id, name: user.name, email: user.email, role: user.role },
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        language: user.language,
+        appearanceSettings: user.appearanceSettings,
+        notificationSettings: user.notificationSettings,
+        twoFactorEnabled: user.twoFactorEnabled
+      },
     })
   } else {
     console.log('Login failed for:', email)
@@ -55,7 +73,16 @@ export const getMe = async (req: any, res: Response) => {
   if (user) {
     res.json({
       success: true,
-      data: { id: user._id, name: user.name, email: user.email, role: user.role },
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        language: user.language,
+        appearanceSettings: user.appearanceSettings,
+        notificationSettings: user.notificationSettings,
+        twoFactorEnabled: user.twoFactorEnabled
+      },
     })
   } else {
     res.status(404).json({ success: false, message: 'User not found' })
