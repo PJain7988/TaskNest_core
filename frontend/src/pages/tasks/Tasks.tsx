@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
 import { useLocation, useSearchParams } from 'react-router-dom'
-import { useTranslation } from '@/hooks/useTranslation'
 
 const taskColumns = [
   { id: 'todo', label: 'To Do', color: 'border-gray-300' },
@@ -14,7 +13,6 @@ const taskColumns = [
 ]
 
 export default function Tasks() {
-  const { t } = useTranslation()
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('search')?.toLowerCase() || ''
@@ -119,7 +117,7 @@ export default function Tasks() {
       {/* Header */}
       <div className="flex-between">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">{t('tasks')}</h1>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Tasks</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Manage and track your team tasks</p>
         </div>
         <button 
@@ -127,7 +125,7 @@ export default function Tasks() {
           className="btn-primary flex items-center gap-2 shadow-primary"
         >
           <Plus className="w-5 h-5" />
-          {t('newTask')}
+          New Task
         </button>
       </div>
 
@@ -142,7 +140,7 @@ export default function Tasks() {
           >
             {/* Column Header */}
             <div className={`flex items-center justify-between mb-6 pb-2 border-b-2 ${column.color}`}>
-              <h2 className="font-bold text-secondary-900 dark:text-white">{t(column.id)}</h2>
+              <h2 className="font-bold text-secondary-900 dark:text-white">{column.label}</h2>
               <span className="bg-white dark:bg-secondary-700 text-xs font-bold px-2 py-1 rounded-md shadow-sm">
                 {tasks[column.id]?.length || 0}
               </span>
@@ -159,7 +157,7 @@ export default function Tasks() {
                 >
                    <div className="flex-between mb-3">
                     <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${priorityColors[task.priority as keyof typeof priorityColors]}`}>
-                      {t(task.priority)}
+                      {task.priority}
                     </span>
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-smooth">
                       <button
@@ -197,7 +195,7 @@ export default function Tasks() {
                 className="w-full py-3 border-2 border-dashed border-gray-200 dark:border-secondary-700 rounded-xl text-gray-400 hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-2 text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
-                {t('createTask').replace('Create ', 'Add ').replace('Crear ', 'Agregar ').replace('Créer ', 'Ajouter ').replace('Aufgabe erstellen', 'Aufgabe hinzufügen')}
+                Add Task
               </button>
             </div>
           </div>

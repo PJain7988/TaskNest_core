@@ -100,6 +100,14 @@ io.on('connection', (socket) => {
     io.emit('task-updated', data)
   })
 
+  socket.on('send-message', (data) => {
+    io.to(data.roomId).emit('receive-message', data)
+  })
+
+  socket.on('typing', (data) => {
+    socket.to(data.roomId).emit('typing', data)
+  })
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id)
   })

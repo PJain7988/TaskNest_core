@@ -1,24 +1,36 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Send, Paperclip, Plus, Search, X, Users } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/services/api'
-import { useTranslation } from '@/hooks/useTranslation'
+import { useAuth } from '@/context/AuthContext'
+import { io as socketIO } from 'socket.io-client'
+
+const SOCKET_URL = import.meta.env.VITE_API_URL 
+  ? import.meta.env.VITE_API_URL.replace('/api/v1', '') 
+  : 'http://localhost:5000'
 
 const initialConversations = [
-  { id: 1, name: 'General', unread: 2, lastMessage: 'Hey team!' },
-  { id: 2, name: 'Project Alpha', unread: 0, lastMessage: 'Meeting at 3 PM' },
-  { id: 3, name: 'Design Team', unread: 5, lastMessage: 'Final designs attached' },
+  { id: '1', name: '📢 General Channel', unread: 0, lastMessage: 'Welcome to the collaborative space!' },
+  { id: '2', name: '🎨 Design Sync', unread: 0, lastMessage: 'Final mockups attached' },
+  { id: '3', name: '🚀 Engineering Room', unread: 0, lastMessage: 'Sprint 2 planning complete' },
 ]
 
 export default function Chat() {
-  const { t } = useTranslation()
   const location = useLocation()
-  const [selectedConversation, setSelectedConversation] = useState(1)
+  const { user } = useAuth()
+  const [selectedConversation, setSelectedConversation] = useState('1')
   const [messageInput, setMessageInput] = useState('')
   const [conversations, setConversations] = useState(initialConversations)
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false)
+  const [socket, setSocket] = useState<any>(null)
   
+  // Real-time typing indicators
+  const [isTyping, setIsTyping] = useState(false)
+  const [typingUser, setTypingUser] = useState('')
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
   const { data: teamMembers } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
@@ -27,26 +39,87 @@ export default function Chat() {
     }
   })
   
-  const [messages, setMessages] = useState([
-    { id: 1, author: 'Alex Rivera', content: 'Hey team! How are we doing today?', timestamp: '10:30 AM', isOwn: false },
-    { id: 2, author: 'You', content: 'All good! Working on the dashboard updates', timestamp: '10:32 AM', isOwn: true },
-    { id: 3, author: 'Jane Smith', content: 'I just pushed the new designs to the repo', timestamp: '10:35 AM', isOwn: false },
-    { id: 4, author: 'You', content: 'Great! I\'ll review them after lunch', timestamp: '10:36 AM', isOwn: true },
+  const [messages, setMessages] = useState<any[]>([
+    { id: '1', roomId: '1', author: 'Jane Cooper', content: 'Welcome to our workspace! Let\'s collaborate here.', timestamp: '10:30 AM', isOwn: false },
+    { id: '2', roomId: '1', author: 'Guy Hawkins', content: 'Excited to be building TaskNest!', timestamp: '10:32 AM', isOwn: false },
+    { id: '3', roomId: '2', author: 'Esther Howard', content: 'Figma links have been shared in Design tab.', timestamp: '11:05 AM', isOwn: false },
   ])
 
+  // Scroll to bottom
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, isTyping])
+
+  // Setup Socket Connection
+  useEffect(() => {
+    const newSocket = socketIO(SOCKET_URL)
+    setSocket(newSocket)
+
+    return () => {
+      newSocket.close()
+    }
+  }, [])
+
+  // Handle Room and Message Events
+  useEffect(() => {
+    if (!socket) return
+
+    const roomId = selectedConversation.toString()
+    socket.emit('join-room', roomId)
+
+    socket.on('receive-message', (data: any) => {
+      if (data.roomId === roomId) {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === data.id)) return prev
+          const msgObj = {
+            ...data,
+            isOwn: data.authorId === user?.id
+          }
+          return [...prev, msgObj]
+        })
+      }
+    })
+
+    socket.on('typing', (data: any) => {
+      if (data.roomId === roomId && data.userId !== user?.id) {
+        setTypingUser(data.userName)
+        setIsTyping(true)
+      }
+    })
+
+    return () => {
+      socket.off('receive-message')
+      socket.off('typing')
+    }
+  }, [socket, selectedConversation, user])
+
+  // Clear typing after pause
+  useEffect(() => {
+    if (isTyping) {
+      const timer = setTimeout(() => {
+        setIsTyping(false)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [isTyping, messageInput])
+
+  // Direct message navigate logic
   useEffect(() => {
     if (location.state?.recipient) {
       const recipient = location.state.recipient
-      // Check if conversation exists
-      const existing = conversations.find(c => c.name === recipient.name)
+      const existing = conversations.find(c => c.name.includes(recipient.name))
       if (existing) {
         setSelectedConversation(existing.id)
       } else {
         const newConv = {
-          id: conversations.length + 1,
-          name: recipient.name,
+          id: (conversations.length + 1).toString(),
+          name: `💬 Chat with ${recipient.name}`,
           unread: 0,
-          lastMessage: 'Starting a new conversation...'
+          lastMessage: 'Let\'s start talking!'
         }
         setConversations([newConv, ...conversations])
         setSelectedConversation(newConv.id)
@@ -55,15 +128,15 @@ export default function Chat() {
   }, [location.state])
 
   const startNewChat = (recipient: any) => {
-    const existing = conversations.find(c => c.name === recipient.name)
+    const existing = conversations.find(c => c.name.includes(recipient.name))
     if (existing) {
       setSelectedConversation(existing.id)
     } else {
       const newConv = {
-        id: conversations.length + 1,
-        name: recipient.name,
+        id: (conversations.length + 1).toString(),
+        name: `💬 Chat with ${recipient.name}`,
         unread: 0,
-        lastMessage: 'Starting a new conversation...'
+        lastMessage: 'Let\'s start talking!'
       }
       setConversations([newConv, ...conversations])
       setSelectedConversation(newConv.id)
@@ -71,135 +144,170 @@ export default function Chat() {
     setIsNewChatModalOpen(false)
   }
 
-  const handleSendMessage = () => {
-    if (messageInput.trim()) {
-      setMessages([
-        ...messages,
-        {
-          id: messages.length + 1,
-          author: 'You',
-          content: messageInput,
-          timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-          isOwn: true,
-        },
-      ])
-      setMessageInput('')
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessageInput(e.target.value)
+    if (socket) {
+      socket.emit('typing', {
+        roomId: selectedConversation.toString(),
+        userId: user?.id,
+        userName: user?.name || 'Someone'
+      })
     }
   }
 
+  const handleSendMessage = () => {
+    if (messageInput.trim() && socket) {
+      const msgData = {
+        id: Date.now().toString(),
+        roomId: selectedConversation.toString(),
+        author: user?.name || 'You',
+        authorId: user?.id,
+        content: messageInput,
+        timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      }
+      socket.emit('send-message', msgData)
+      setMessages((prev) => [...prev, { ...msgData, isOwn: true }])
+      setMessageInput('')
+      setIsTyping(false)
+    }
+  }
+
+  // Active room messages
+  const activeRoomMessages = messages.filter((m) => m.roomId === selectedConversation)
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-150px)]">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-140px)]">
       {/* Conversations Sidebar */}
-      <div className="lg:col-span-1 card p-4 flex flex-col overflow-hidden">
-        <div className="flex-between mb-4">
-          <h2 className="font-bold text-secondary-900 dark:text-white">{t('messages')}</h2>
+      <div className="lg:col-span-1 card p-5 flex flex-col overflow-hidden bg-white/60 dark:bg-secondary-800/60 backdrop-blur-lg border border-gray-100 dark:border-secondary-700/50">
+        <div className="flex-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-secondary-900 dark:text-white">Workspace Chat</h2>
+            <p className="text-xs text-gray-500 font-medium">Real-time team collaboration</p>
+          </div>
           <button 
             onClick={() => setIsNewChatModalOpen(true)}
-            className="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-smooth"
+            className="p-2.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl transition-all duration-200"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="relative mb-4">
+        <div className="relative mb-5">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input 
             type="text" 
-            placeholder={t('searchPlaceholder')} 
-            className="input-base pl-10 text-sm py-2"
+            placeholder="Search channels..." 
+            className="input-base pl-10 text-sm py-2.5"
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-          {conversations.map((conv) => (
-            <button
-              key={conv.id}
-              onClick={() => setSelectedConversation(conv.id)}
-              className={`w-full text-left p-4 rounded-2xl transition-smooth relative group ${
-                selectedConversation === conv.id
-                  ? 'bg-primary text-white shadow-primary'
-                  : 'hover:bg-gray-100 dark:hover:bg-secondary-700 text-secondary-900 dark:text-gray-300'
-              }`}
-            >
-              <div className="flex-between mb-1">
-                <p className="font-bold truncate pr-4">{conv.name}</p>
-                {conv.unread > 0 && (
-                  <span className="bg-danger text-white text-[10px] font-black rounded-full px-1.5 py-0.5">
-                    {conv.unread}
-                  </span>
-                )}
-              </div>
-              <p className={`text-xs truncate ${selectedConversation === conv.id ? 'text-white/70' : 'text-gray-500 font-medium'}`}>
-                {conv.lastMessage}
-              </p>
-            </button>
-          ))}
+        <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+          {conversations.map((conv) => {
+            const isSelected = selectedConversation === conv.id
+            return (
+              <button
+                key={conv.id}
+                onClick={() => setSelectedConversation(conv.id)}
+                className={`w-full text-left p-4 rounded-2xl transition-all duration-300 relative group ${
+                  isSelected
+                    ? 'bg-primary text-white shadow-lg shadow-primary/25 translate-x-1'
+                    : 'hover:bg-gray-100/70 dark:hover:bg-secondary-700/50 text-secondary-900 dark:text-gray-300'
+                }`}
+              >
+                <div className="flex-between mb-1.5">
+                  <p className="font-bold truncate pr-3 text-sm">{conv.name}</p>
+                </div>
+                <p className={`text-xs truncate ${isSelected ? 'text-white/70' : 'text-gray-500'}`}>
+                  {conv.lastMessage}
+                </p>
+              </button>
+            )
+          })}
         </div>
       </div>
 
       {/* Chat Area */}
-      <div className="lg:col-span-3 card flex flex-col overflow-hidden">
+      <div className="lg:col-span-3 card flex flex-col overflow-hidden bg-white/60 dark:bg-secondary-800/60 backdrop-blur-lg border border-gray-100 dark:border-secondary-700/50 shadow-xl">
         {/* Header */}
-        <div className="p-6 border-b border-gray-100 dark:border-secondary-700 flex-between bg-white/50 dark:bg-secondary-800/50 backdrop-blur-md">
+        <div className="p-5 border-b border-gray-100 dark:border-secondary-700/50 flex-between bg-white/80 dark:bg-secondary-800/80 backdrop-blur-md">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-gradient-primary flex-center text-white font-bold">
-              {conversations.find(c => c.id === selectedConversation)?.name.charAt(0)}
+            <div className="w-11 h-11 rounded-2xl bg-gradient-primary flex-center text-white font-extrabold shadow-sm">
+              {conversations.find(c => c.id === selectedConversation)?.name.charAt(2) || '📢'}
             </div>
             <div>
               <h2 className="font-bold text-secondary-900 dark:text-white">
                 {conversations.find(c => c.id === selectedConversation)?.name}
               </h2>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-success"></span>
-                <p className="text-[10px] font-bold text-gray-400 tracking-wider">ONLINE</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
+                <p className="text-[10px] font-black text-gray-400 tracking-widest uppercase">REAL-TIME SOCKET</p>
               </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <button className="p-2 hover:bg-gray-100 dark:hover:bg-secondary-700 rounded-xl transition-smooth">
-              <Plus className="w-5 h-5 text-gray-500" />
-            </button>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/30 dark:bg-secondary-900/10">
-          {messages.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[70%] ${msg.isOwn ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                {!msg.isOwn && <p className="text-[10px] font-bold text-gray-500 ml-1 mb-1">{msg.author}</p>}
-                <div className={`rounded-2xl px-4 py-3 shadow-soft ${
-                  msg.isOwn 
-                    ? 'bg-primary text-white rounded-tr-none' 
-                    : 'bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white rounded-tl-none'
-                }`}>
-                  <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
+        <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-gray-50/20 dark:bg-secondary-900/10 custom-scrollbar">
+          {activeRoomMessages.length > 0 ? (
+            activeRoomMessages.map((msg) => (
+              <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[70%] ${msg.isOwn ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                  {!msg.isOwn && <p className="text-[10px] font-bold text-gray-500 ml-1 mb-1">{msg.author}</p>}
+                  <div className={`rounded-2xl px-4 py-3 shadow-sm ${
+                    msg.isOwn 
+                      ? 'bg-primary text-white rounded-tr-none shadow-md shadow-primary/10' 
+                      : 'bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white rounded-tl-none border border-gray-100 dark:border-secondary-600/30'
+                  }`}>
+                    <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
+                  </div>
+                  <p className="text-[9px] font-black text-gray-400 mt-1 opacity-60 px-1 uppercase tracking-wider">
+                    {msg.timestamp}
+                  </p>
                 </div>
-                <p className="text-[10px] font-bold text-gray-400 mt-1 opacity-60 px-1">
-                  {msg.timestamp}
-                </p>
+              </div>
+            ))
+          ) : (
+            <div className="h-full flex-center flex-col text-gray-400/80">
+              <Users className="w-12 h-12 mb-3 opacity-30 animate-pulse text-primary" />
+              <p className="text-sm font-bold">No messages in this room yet</p>
+              <p className="text-xs mt-1">Send a message to start real-time discussion!</p>
+            </div>
+          )}
+
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="flex justify-start animate-fade-in">
+              <div className="flex flex-col gap-1">
+                <p className="text-[10px] font-bold text-gray-500 ml-1 mb-0.5">{typingUser}</p>
+                <div className="bg-white dark:bg-secondary-700 rounded-2xl px-4 py-3 rounded-tl-none border border-gray-100 dark:border-secondary-600/30 shadow-sm flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                  <span className="w-2 h-2 bg-gray-400 dark:bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                </div>
               </div>
             </div>
-          ))}
+          )}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input */}
-        <div className="p-6 border-t border-gray-100 dark:border-secondary-700 bg-white/50 dark:bg-secondary-800/50 backdrop-blur-md">
+        <div className="p-5 border-t border-gray-100 dark:border-secondary-700/50 bg-white/80 dark:bg-secondary-800/80 backdrop-blur-md">
           <div className="flex gap-4">
-            <button className="p-3 bg-gray-100 dark:bg-secondary-700 rounded-2xl hover:bg-primary/10 hover:text-primary transition-smooth">
-              <Paperclip className="w-5 h-5" />
+            <button className="p-3 bg-gray-100 dark:bg-secondary-700 rounded-2xl hover:bg-primary/10 hover:text-primary transition-all duration-200">
+              <Paperclip className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
             <input
               type="text"
               value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
+              onChange={handleInputChange}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder={t('todo') === 'Zu tun' ? 'Schreiben Sie Ihre Nachricht...' : t('todo') === 'À Faire' ? 'Tapez votre message...' : t('todo') === 'Por Hacer' ? 'Escribe tu mensaje...' : 'Type your message here...'}
-              className="input-base flex-1 py-3"
+              placeholder="Type your collaborative message here..."
+              className="input-base flex-1 py-3 text-sm focus:ring-primary focus:border-transparent"
             />
             <button
               onClick={handleSendMessage}
-              className="p-3 bg-primary text-white hover:bg-primary-700 rounded-2xl shadow-primary transition-smooth"
+              disabled={!messageInput.trim()}
+              className="p-3 bg-primary text-white hover:bg-primary-700 rounded-2xl shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-5 h-5" />
             </button>
@@ -210,11 +318,11 @@ export default function Chat() {
       {/* New Chat Modal */}
       {isNewChatModalOpen && (
         <div className="fixed inset-0 z-50 flex-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-secondary-800 rounded-3xl shadow-2xl animate-scale-in w-full max-w-md">
+          <div className="bg-white dark:bg-secondary-800 rounded-3xl shadow-2xl animate-scale-in w-full max-w-md border border-gray-100 dark:border-secondary-700/50">
             <div className="p-6 border-b border-gray-100 dark:border-secondary-700 flex-between">
               <div>
-                <h2 className="text-xl font-bold text-secondary-900 dark:text-white">{t('todo') === 'Zu tun' ? 'Neue Nachricht' : t('todo') === 'À Faire' ? 'Nouveau Message' : t('todo') === 'Por Hacer' ? 'Nuevo Mensaje' : 'New Message'}</h2>
-                <p className="text-sm text-gray-500">{t('todo') === 'Zu tun' ? 'Wählen Sie ein Teammitglied' : t('todo') === 'À Faire' ? 'Sélectionnez un membre' : t('todo') === 'Por Hacer' ? 'Selecciona un miembro de equipo' : 'Select a team member to start a conversation'}</p>
+                <h2 className="text-xl font-bold text-secondary-900 dark:text-white">Direct Message</h2>
+                <p className="text-sm text-gray-500">Start talking with team members</p>
               </div>
               <button
                 onClick={() => setIsNewChatModalOpen(false)}
@@ -229,7 +337,7 @@ export default function Chat() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder={t('searchPlaceholder')}
+                  placeholder="Search team members..."
                   className="input-base pl-10 text-sm py-2"
                 />
               </div>
