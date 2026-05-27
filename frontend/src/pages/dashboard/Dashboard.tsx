@@ -21,9 +21,11 @@ import {
   Target
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   
   const { data: dashboardData, isLoading } = useQuery({
@@ -53,7 +55,7 @@ export default function Dashboard() {
       <div className="flex-between">
         <div>
           <h1 className="text-4xl font-bold text-secondary-900 dark:text-white tracking-tight">
-            Welcome back, <span className="text-primary">{user?.name}</span> 👋
+            {t('welcomeBack')}, <span className="text-primary">{user?.name}</span> 👋
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2 font-medium">Here's what's happening with your projects today.</p>
         </div>
@@ -63,14 +65,14 @@ export default function Dashboard() {
             className="btn-secondary flex items-center gap-2"
           >
             <Clock className="w-4 h-4" />
-            Activity Log
+            {t('activityLog')}
           </button>
           <button 
             onClick={() => navigate('/projects', { state: { openModal: true } })}
             className="btn-primary flex items-center gap-2 shadow-primary"
           >
             <Plus className="w-4 h-4" />
-            New Project
+            {t('newProject')}
           </button>
         </div>
       </div>
@@ -103,7 +105,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 card p-8">
           <div className="flex-between mb-8">
             <div>
-              <h3 className="text-xl font-bold text-secondary-900 dark:text-white">Project Velocity</h3>
+              <h3 className="text-xl font-bold text-secondary-900 dark:text-white">{t('projectVelocity')}</h3>
               <p className="text-sm text-gray-500 font-medium">Task completion rate over time</p>
             </div>
             <select className="bg-gray-50 dark:bg-secondary-800 border-none rounded-xl text-sm font-bold px-4 py-2 focus:ring-2 ring-primary">
@@ -167,7 +169,7 @@ export default function Dashboard() {
         {/* Recent Tasks */}
         <div className="card p-8">
           <div className="flex-between mb-8">
-            <h3 className="text-xl font-bold text-secondary-900 dark:text-white">Recent Activity</h3>
+            <h3 className="text-xl font-bold text-secondary-900 dark:text-white">{t('recentActivity')}</h3>
             <button className="text-sm font-bold text-primary hover:underline">View All</button>
           </div>
           
@@ -203,7 +205,7 @@ export default function Dashboard() {
             className="w-full mt-8 py-4 bg-secondary-900 dark:bg-white text-white dark:text-secondary-900 rounded-2xl font-bold flex-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
             <Plus className="w-5 h-5" />
-            Create Task
+            {t('createTask')}
           </button>
         </div>
       </div>

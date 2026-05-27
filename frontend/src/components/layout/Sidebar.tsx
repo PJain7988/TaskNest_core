@@ -29,9 +29,11 @@ const secondaryItems = [
 ]
 
 import { useAuth } from '@/context/AuthContext'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const { user, logout } = useAuth()
+  const { t } = useTranslation()
   const location = useLocation()
 
   const isActive = (path: string) => location.pathname === path
@@ -82,7 +84,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                   }`}
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-medium">{t(item.label.toLowerCase())}</span>
                   {active && <ChevronRight className="w-4 h-4 ml-auto" />}
                 </Link>
               )
@@ -105,7 +107,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-smooth"
                   >
                     <Icon className="w-5 h-5" />
-                    <span className="font-medium">{item.label}</span>
+                    <span className="font-medium">{t(item.label.toLowerCase())}</span>
                   </button>
                 )
               }
@@ -117,7 +119,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                   className="flex items-center gap-3 px-4 py-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-smooth"
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-medium">{t(item.label.toLowerCase())}</span>
                 </Link>
               )
             })}
@@ -125,7 +127,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
 
           {/* Profile card */}
           <div className="mt-4 p-4 bg-white/10 rounded-lg">
-            <p className="text-xs text-white/70">Logged in as</p>
+            <p className="text-xs text-white/70">{t('loggedAs')}</p>
             <p className="font-semibold text-sm">{user?.name || 'Guest'}</p>
           </div>
         </div>

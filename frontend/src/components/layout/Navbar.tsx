@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { Menu, Bell, Search, Settings, LogOut, User } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { useTranslation } from '@/hooks/useTranslation'
 
 interface NavbarProps {
   toggleSidebar: () => void
@@ -9,6 +10,7 @@ interface NavbarProps {
 
 export default function Navbar({ toggleSidebar }: NavbarProps) {
   const { user, logout } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -47,7 +49,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
             <Search className="w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search projects, tasks..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
@@ -85,14 +87,14 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
                   className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-secondary-700 transition-smooth"
                 >
                   <User className="w-4 h-4" />
-                  <span>Profile</span>
+                  <span>{t('profile')}</span>
                 </Link>
                 <Link
                   to="/settings"
                   className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-secondary-700 transition-smooth text-left"
                 >
                   <Settings className="w-4 h-4" />
-                  <span>Settings</span>
+                  <span>{t('settings')}</span>
                 </Link>
                 <hr className="my-1 dark:border-secondary-700" />
                 <button 
@@ -100,7 +102,7 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
                   className="w-full flex items-center gap-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-secondary-700 transition-smooth text-danger text-left"
                 >
                   <LogOut className="w-4 h-4" />
-                  <span>Logout</span>
+                  <span>{t('logout')}</span>
                 </button>
               </div>
             )}
