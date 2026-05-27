@@ -74,7 +74,8 @@ export default function Settings() {
     setLanguage(lang)
     try {
       await api.put('/users/settings', { language: lang })
-      toast({ title: 'Language Changed', description: `Language set to ${lang === 'en' ? 'English' : lang === 'es' ? 'Spanish' : 'French'}.` })
+      const langNames: Record<string, string> = { en: 'English', es: 'Spanish', fr: 'French', de: 'German' }
+      toast({ title: 'Language Changed', description: `Language set to ${langNames[lang] || lang}.` })
       if (user) updateAuthUser({ ...user, language: lang })
     } catch (err) {
       toast({ title: 'Error', description: 'Failed to update language', variant: 'destructive' })

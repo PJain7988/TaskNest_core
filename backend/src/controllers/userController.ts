@@ -71,10 +71,21 @@ export const deleteUser = async (req: Request, res: Response) => {
 }
 
 export const updateSettings = async (req: any, res: Response) => {
-  const { notificationSettings, appearanceSettings, language } = req.body
+  const updateFields: any = {}
+  
+  if (req.body.notificationSettings !== undefined) {
+    updateFields.notificationSettings = req.body.notificationSettings
+  }
+  if (req.body.appearanceSettings !== undefined) {
+    updateFields.appearanceSettings = req.body.appearanceSettings
+  }
+  if (req.body.language !== undefined) {
+    updateFields.language = req.body.language
+  }
+
   const user = await User.findByIdAndUpdate(
     req.user.id,
-    { notificationSettings, appearanceSettings, language },
+    { $set: updateFields },
     { new: true }
   ).select('-password')
 
