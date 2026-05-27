@@ -6,6 +6,7 @@ export interface User {
   role: 'admin' | 'manager' | 'user'
   status: 'active' | 'inactive'
   joinedAt: string
+  createdAt?: string
 }
 
 export interface Project {

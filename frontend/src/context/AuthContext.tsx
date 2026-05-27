@@ -21,6 +21,7 @@ interface User {
   }
   language?: string
   twoFactorEnabled?: boolean
+  createdAt?: string
 }
 
 interface AuthContextType {

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { Camera, Mail, Phone, MapPin, Edit2, Save } from 'lucide-react'
+import { Camera, Mail, Phone, MapPin, Edit2, Save, FileText, Briefcase, Users, Calendar } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { api } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
+import { useQuery } from '@tanstack/react-query'
 
 export default function Profile() {
   const { user, updateUser } = useAuth()
@@ -18,6 +19,31 @@ export default function Profile() {
     phone: '',
     location: '',
     bio: '',
+  })
+
+  // Dynamic state queries using React Query
+  const { data: projects } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const { data } = await api.getProjects()
+      return data.data
+    }
+  })
+
+  const { data: tasks } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: async () => {
+      const { data } = await api.getTasks()
+      return data.data
+    }
+  })
+
+  const { data: teamMembers } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const { data } = await api.getUsers()
+      return data.data
+    }
   })
 
   useEffect(() => {
@@ -87,15 +113,46 @@ export default function Profile() {
     .toUpperCase()
     .slice(0, 2) || 'JD'
 
+  // Dynamic Statistics Calculations
+  const completedTasks = tasks ? tasks.filter((t: any) => t.status === 'done') : []
+  const completedCount = completedTasks.length
+
+  // Calculate completed this month (last 30 days)
+  const thirtyDaysAgo = new Date()
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+  const completedThisMonth = completedTasks.filter((t: any) => new Date(t.updatedAt) >= thirtyDaysAgo).length
+
+  // Projects led by current user
+  const projectsLed = projects ? projects.filter((p: any) => p.owner?._id === user?.id || p.owner === user?.id) : []
+  const projectsLedCount = projectsLed.length
+  const activeProjectsCount = projectsLed.filter((p: any) => p.status === 'in-progress').length
+
+  // Team members
+  const teamMembersCount = teamMembers ? teamMembers.length : 0
+
+  // Join Date calculation
+  const joinDate = user?.createdAt ? new Date(user.createdAt) : new Date('2026-01-01')
+  const memberSinceFormatted = joinDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  const diffTime = Math.abs(new Date().getTime() - joinDate.getTime())
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const memberDuration = diffDays >= 365 
+    ? `${Math.floor(diffDays / 365)}+ year${Math.floor(diffDays / 365) > 1 ? 's' : ''}`
+    : `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) !== 1 ? 's' : ''}`
+
+  // Dynamic Activities
+  const recentActivities = tasks 
+    ? [...tasks].sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4)
+    : []
+
   return (
     <div className="max-w-4xl space-y-6">
       {/* Profile Header */}
-      <div className="card p-8">
+      <div className="card p-8 bg-white/60 dark:bg-secondary-800/60 backdrop-blur-lg border border-gray-100 dark:border-secondary-700/50">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Avatar */}
           <div className="flex-shrink-0">
             <div className="relative">
-              <div className="w-32 h-32 rounded-full bg-gradient-primary flex-center text-white text-5xl font-bold overflow-hidden">
+              <div className="w-32 h-32 rounded-full bg-gradient-primary flex-center text-white text-5xl font-bold overflow-hidden shadow-lg shadow-primary/20">
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -130,29 +187,31 @@ export default function Profile() {
             {!isEditing ? (
               <>
                 <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">{user?.name}</h1>
-                <p className="text-lg text-primary mt-1 capitalize">{user?.role}</p>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">{user?.bio || 'No bio provided'}</p>
+                <p className="text-lg text-primary mt-1 capitalize font-medium">{user?.role}</p>
+                <p className="text-gray-600 dark:text-gray-400 mt-2 italic">
+                  {user?.bio || '"No biography provided yet. Set a custom bio using Edit Profile below."'}
+                </p>
 
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3">
                     <Mail className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Email</p>
-                      <p className="text-sm font-medium text-secondary-900 dark:text-white">{user?.email}</p>
+                      <p className="text-xs text-gray-500">Email</p>
+                      <p className="text-sm font-semibold text-secondary-900 dark:text-white">{user?.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <Phone className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Phone</p>
-                      <p className="text-sm font-medium text-secondary-900 dark:text-white">{user?.phone || 'Not provided'}</p>
+                      <p className="text-xs text-gray-500">Phone</p>
+                      <p className="text-sm font-semibold text-secondary-900 dark:text-white">{user?.phone || 'Not provided'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <MapPin className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">Location</p>
-                      <p className="text-sm font-medium text-secondary-900 dark:text-white">{user?.location || 'Not provided'}</p>
+                      <p className="text-xs text-gray-500">Location</p>
+                      <p className="text-sm font-semibold text-secondary-900 dark:text-white">{user?.location || 'Not provided'}</p>
                     </div>
                   </div>
                 </div>
@@ -170,7 +229,7 @@ export default function Profile() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Name</label>
+                      <label className="block text-sm font-semibold text-secondary-900 dark:text-white mb-1">Name</label>
                       <input
                         type="text"
                         value={formData.name}
@@ -179,7 +238,7 @@ export default function Profile() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Email</label>
+                      <label className="block text-sm font-semibold text-secondary-900 dark:text-white mb-1">Email</label>
                       <input
                         type="email"
                         value={formData.email}
@@ -191,7 +250,7 @@ export default function Profile() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Phone</label>
+                      <label className="block text-sm font-semibold text-secondary-900 dark:text-white mb-1">Phone</label>
                       <input
                         type="text"
                         value={formData.phone}
@@ -201,7 +260,7 @@ export default function Profile() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Location</label>
+                      <label className="block text-sm font-semibold text-secondary-900 dark:text-white mb-1">Location</label>
                       <input
                         type="text"
                         value={formData.location}
@@ -212,7 +271,7 @@ export default function Profile() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Bio</label>
+                    <label className="block text-sm font-semibold text-secondary-900 dark:text-white mb-1">Bio</label>
                     <textarea
                       value={formData.bio}
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
@@ -251,45 +310,91 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Activity Stats */}
+      {/* Dynamic Activity Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="card p-6">
-          <p className="text-gray-600 dark:text-gray-400 text-sm">Tasks Completed</p>
-          <p className="text-3xl font-bold text-primary mt-2">127</p>
-          <p className="text-xs text-success mt-1">+12 this month</p>
+        <div className="card p-6 bg-white/60 dark:bg-secondary-800/60 backdrop-blur-lg border border-gray-100 dark:border-secondary-700/50 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Tasks Completed</p>
+              <FileText className="w-4 h-4 text-primary" />
+            </div>
+            <p className="text-3xl font-extrabold text-primary mt-1">{completedCount}</p>
+          </div>
+          <p className="text-[11px] text-success font-black mt-2">
+            +{completedThisMonth} completed this month
+          </p>
         </div>
-        <div className="card p-6">
-          <p className="text-gray-600 dark:text-gray-400 text-sm">Projects Led</p>
-          <p className="text-3xl font-bold text-accent mt-2">8</p>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">3 active</p>
+        
+        <div className="card p-6 bg-white/60 dark:bg-secondary-800/60 backdrop-blur-lg border border-gray-100 dark:border-secondary-700/50 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Projects Led</p>
+              <Briefcase className="w-4 h-4 text-accent" />
+            </div>
+            <p className="text-3xl font-extrabold text-accent mt-1">{projectsLedCount}</p>
+          </div>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 font-bold mt-2">
+            {activeProjectsCount} active projects
+          </p>
         </div>
-        <div className="card p-6">
-          <p className="text-gray-600 dark:text-gray-400 text-sm">Team Members</p>
-          <p className="text-3xl font-bold text-success mt-2">24</p>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">Direct reports</p>
+
+        <div className="card p-6 bg-white/60 dark:bg-secondary-800/60 backdrop-blur-lg border border-gray-100 dark:border-secondary-700/50 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Team Members</p>
+              <Users className="w-4 h-4 text-success" />
+            </div>
+            <p className="text-3xl font-extrabold text-success mt-1">{teamMembersCount}</p>
+          </div>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 font-bold mt-2">
+            Total workspace reports
+          </p>
         </div>
-        <div className="card p-6">
-          <p className="text-gray-600 dark:text-gray-400 text-sm">Member Since</p>
-          <p className="text-xl font-bold text-secondary-900 dark:text-white mt-2">Jan 2023</p>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">1+ year</p>
+
+        <div className="card p-6 bg-white/60 dark:bg-secondary-800/60 backdrop-blur-lg border border-gray-100 dark:border-secondary-700/50 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Member Since</p>
+              <Calendar className="w-4 h-4 text-warning" />
+            </div>
+            <p className="text-xl font-black text-secondary-900 dark:text-white mt-2 truncate">{memberSinceFormatted}</p>
+          </div>
+          <p className="text-[11px] text-warning font-black mt-2">
+            Joined {memberDuration} ago
+          </p>
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div className="card p-6">
-        <h3 className="text-lg font-semibold text-secondary-900 dark:text-white mb-6">Recent Activity</h3>
+      <div className="card p-6 bg-white/60 dark:bg-secondary-800/60 backdrop-blur-lg border border-gray-100 dark:border-secondary-700/50 shadow-md">
+        <h3 className="text-lg font-bold text-secondary-900 dark:text-white mb-6">Recent Activity</h3>
         <div className="space-y-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex gap-4 pb-4 border-b border-gray-200 dark:border-secondary-700 last:border-0 last:pb-0">
-              <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-secondary-900 dark:text-white">
-                  Completed task "API Integration"
-                </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">2 hours ago</p>
+          {recentActivities.length > 0 ? (
+            recentActivities.map((act: any) => (
+              <div key={act._id} className="flex gap-4 pb-4 border-b border-gray-100 dark:border-secondary-700/50 last:border-0 last:pb-0">
+                <div className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${
+                  act.status === 'done' ? 'bg-success' : 'bg-primary'
+                }`} />
+                <div>
+                  <p className="text-sm font-semibold text-secondary-900 dark:text-white">
+                    {act.status === 'done' ? 'Completed' : 'Updated'} task "{act.title}"
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                    {new Date(act.updatedAt).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric', 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </p>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="text-center py-6 text-gray-400">
+              <p className="text-sm font-medium">No recent activities found</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>
