@@ -4,8 +4,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
 import { useLocation, useSearchParams } from 'react-router-dom'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function Projects() {
+  const { t } = useTranslation()
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('search')?.toLowerCase() || ''
@@ -94,7 +96,7 @@ export default function Projects() {
       {/* Header */}
       <div className="flex-between">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Projects</h1>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">{t('projects')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Manage and track all your projects</p>
         </div>
         <button 
@@ -102,7 +104,7 @@ export default function Projects() {
           className="btn-primary flex items-center gap-2 shadow-primary"
         >
           <Plus className="w-5 h-5" />
-          New Project
+          {t('newProject')}
         </button>
       </div>
 
@@ -119,7 +121,7 @@ export default function Projects() {
                   : 'bg-gray-100 dark:bg-secondary-800 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              <span className="capitalize">{mode} View</span>
+              <span className="capitalize">{mode === 'grid' ? t('gridView') : t('listView')}</span>
             </button>
           ))}
         </div>
@@ -152,7 +154,7 @@ export default function Projects() {
                 <div>
                   <h3 className="text-lg font-bold text-secondary-900 dark:text-white leading-tight">{project.name}</h3>
                   <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md mt-1 inline-block ${statusColors[project.status as keyof typeof statusColors]}`}>
-                    {project.status}
+                    {t(project.status)}
                   </span>
                 </div>
               </div>
@@ -167,7 +169,7 @@ export default function Projects() {
                   />
                 </div>
                 <div className="flex-between text-xs font-bold text-gray-500">
-                  <span>Progress</span>
+                  <span>{t('progress')}</span>
                   <span className="text-primary">{project.progress}%</span>
                 </div>
               </div>
@@ -181,7 +183,7 @@ export default function Projects() {
                   onClick={() => setSelectedProject(project)}
                   className="flex items-center gap-1.5 text-xs font-bold text-primary group-hover:gap-2 transition-all"
                 >
-                  Details <ExternalLink className="w-3 h-3" />
+                  {t('details')} <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
             </div>
@@ -192,10 +194,10 @@ export default function Projects() {
           <table className="w-full text-left">
             <thead className="bg-gray-50 dark:bg-secondary-800 border-b border-gray-100 dark:border-secondary-700">
               <tr>
-                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">Project</th>
-                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">Status</th>
-                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">Due Date</th>
-                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-right">Progress</th>
+                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">{t('projects')}</th>
+                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">{t('todo') === 'Zu tun' ? 'Status' : t('todo') === 'À Faire' ? 'Statut' : t('todo') === 'Por Hacer' ? 'Estado' : 'Status'}</th>
+                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">{t('dueDate')}</th>
+                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-right">{t('progress')}</th>
               </tr>
             </thead>
             <tbody>
@@ -207,7 +209,7 @@ export default function Projects() {
                   </td>
                   <td className="p-4">
                     <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-md ${statusColors[project.status as keyof typeof statusColors]}`}>
-                      {project.status}
+                      {t(project.status)}
                     </span>
                   </td>
                   <td className="p-4 text-xs text-gray-500">{new Date(project.dueDate).toLocaleDateString()}</td>

@@ -4,8 +4,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function Team() {
+  const { t } = useTranslation()
   const { toast } = useToast()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -34,7 +36,7 @@ export default function Team() {
       {/* Header */}
       <div className="flex-between">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Team Members</h1>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">{t('team')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your team and collaborate</p>
         </div>
         <button 
@@ -42,7 +44,7 @@ export default function Team() {
           className="btn-primary flex items-center gap-2 shadow-primary"
         >
           <Plus className="w-5 h-5" />
-          Invite Member
+          {t('todo') === 'Zu tun' ? 'Mitglied einladen' : t('todo') === 'À Faire' ? 'Inviter un membre' : t('todo') === 'Por Hacer' ? 'Invitar Miembro' : 'Invite Member'}
         </button>
       </div>
 
@@ -94,14 +96,14 @@ export default function Team() {
                 className="flex-1 btn-secondary text-sm flex items-center justify-center gap-2"
               >
                 <MessageSquare className="w-4 h-4" />
-                Message
+                {t('todo') === 'Zu tun' ? 'Nachricht' : t('todo') === 'À Faire' ? 'Message' : t('todo') === 'Por Hacer' ? 'Mensaje' : 'Message'}
               </button>
               <button 
                 onClick={() => navigate('/tasks')}
                 className="flex-1 btn-ghost text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-secondary-700"
               >
                 <Plus className="w-4 h-4" />
-                Assign
+                {t('todo') === 'Zu tun' ? 'Zuweisen' : t('todo') === 'À Faire' ? 'Assigner' : t('todo') === 'Por Hacer' ? 'Asignar' : 'Assign'}
               </button>
             </div>
           </div>

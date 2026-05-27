@@ -8,6 +8,8 @@ interface User {
   role: string
   bio?: string
   avatar?: string
+  phone?: string
+  location?: string
   notificationSettings?: {
     email: boolean
     push: boolean
