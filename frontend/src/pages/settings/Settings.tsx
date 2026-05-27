@@ -4,9 +4,11 @@ import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
 import api from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function Settings() {
   const { user, updateUser: updateAuthUser } = useAuth()
+  const { t } = useTranslation()
   const { theme, setTheme, accentColor, setAccentColor } = useTheme()
   const [activeTab, setActiveTab] = useState('profile')
   const { toast } = useToast()
@@ -124,7 +126,7 @@ export default function Settings() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
       <div>
-        <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Settings</h1>
+        <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">{t('settings')}</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">Manage your account settings and preferences</p>
       </div>
 
@@ -144,7 +146,7 @@ export default function Settings() {
                 }`}
               >
                 <Icon className="w-5 h-5" />
-                <span className="font-medium">{tab.label}</span>
+                <span className="font-medium">{t(tab.id)}</span>
               </button>
             )
           })}
@@ -155,7 +157,7 @@ export default function Settings() {
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">Profile Information</h3>
+                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">{t('editProfile')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Update your personal details</p>
               </div>
 
@@ -164,14 +166,14 @@ export default function Settings() {
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <button className="btn-primary text-sm">Change Photo</button>
+                  <button className="btn-primary text-sm">{t('changePhoto')}</button>
                   <p className="text-xs text-gray-500 mt-2 font-medium uppercase tracking-wider">JPG, GIF or PNG. Max size of 800K</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">Full Name</label>
+                  <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">{t('fullName')}</label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -184,7 +186,7 @@ export default function Settings() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">Email Address</label>
+                  <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">{t('emailAddress')}</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
@@ -200,7 +202,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">Bio</label>
+                <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">{t('bio')}</label>
                 <textarea
                   value={profileData.bio}
                   onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
@@ -210,7 +212,7 @@ export default function Settings() {
               </div>
 
               <div className="flex justify-end pt-4">
-                <button onClick={handleProfileSave} className="btn-primary px-8">Save Changes</button>
+                <button onClick={handleProfileSave} className="btn-primary px-8">{t('saveChanges')}</button>
               </div>
             </div>
           )}
@@ -218,7 +220,7 @@ export default function Settings() {
           {activeTab === 'notifications' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">Notification Preferences</h3>
+                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">{t('notifications')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Decide how you'd like to be notified</p>
               </div>
 
@@ -249,7 +251,7 @@ export default function Settings() {
           {activeTab === 'security' && (
             <div className="space-y-6">
                <div>
-                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">Security Settings</h3>
+                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">{t('security')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Manage your account protection</p>
               </div>
 
@@ -272,7 +274,7 @@ export default function Settings() {
               </div>
 
               <div className="pt-6 border-t border-gray-100 dark:border-secondary-700 space-y-4">
-                <h4 className="font-semibold text-secondary-900 dark:text-white">Change Password</h4>
+                <h4 className="font-semibold text-secondary-900 dark:text-white">{t('updatePassword')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-gray-500 uppercase">Current Password</label>
@@ -296,7 +298,7 @@ export default function Settings() {
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <button onClick={handlePasswordUpdate} className="btn-primary">Update Password</button>
+                  <button onClick={handlePasswordUpdate} className="btn-primary">{t('updatePassword')}</button>
                 </div>
               </div>
             </div>
@@ -305,12 +307,12 @@ export default function Settings() {
           {activeTab === 'appearance' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">Appearance Settings</h3>
+                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">{t('appearance')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Personalize your Workspace</p>
               </div>
 
               <div className="space-y-4">
-                <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">Interface Theme</label>
+                <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">{t('theme')}</label>
                 <div className="grid grid-cols-3 gap-4">
                   {(['light', 'dark', 'system'] as const).map((t) => (
                     <button
@@ -328,7 +330,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-4">
-                <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">Accent Color</label>
+                <label className="text-sm font-semibold text-secondary-700 dark:text-gray-300">{t('accentColor')}</label>
                 <div className="flex gap-4">
                   {accentColors.map((color) => (
                     <button
@@ -355,7 +357,7 @@ export default function Settings() {
           {activeTab === 'language' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">Language & Region</h3>
+                <h3 className="text-xl font-semibold text-secondary-900 dark:text-white">{t('language')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Choose your preferred language</p>
               </div>
 
