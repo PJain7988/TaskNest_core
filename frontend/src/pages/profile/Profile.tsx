@@ -26,8 +26,8 @@ export default function Profile() {
         name: user.name || '',
         email: user.email || '',
         role: user.role || 'Member',
-        phone: '',
-        location: '',
+        phone: user.phone || '',
+        location: user.location || '',
         bio: user.bio || '',
       })
       if (user.avatar) setAvatarUrl(user.avatar)
@@ -36,7 +36,7 @@ export default function Profile() {
 
   const handleSave = async () => {
     try {
-      const { data } = await api.updateUser(user!.id, { ...formData, avatar: avatarUrl })
+      const { data } = await api.updateUser(user!.id, formData)
       if (data.success) {
         updateUser(data.data)
         setIsEditing(false)
@@ -54,25 +54,28 @@ export default function Profile() {
       toast({ title: 'File too large', description: 'Please choose an image under 2MB', variant: 'destructive' })
       return
     }
-    const reader = new FileReader()
-    reader.onload = async (evt) => {
-      const url = evt.target?.result as string
-      setAvatarUrl(url)
-      // Auto-save immediately
-      try {
-        setSavingPhoto(true)
-        const { data } = await api.updateUser(user!.id, { avatar: url })
-        if (data.success) {
-          updateUser({ ...user!, avatar: url })
-          toast({ title: 'Photo Updated', description: 'Profile photo saved successfully.' })
-        }
-      } catch {
-        toast({ title: 'Save Failed', description: 'Could not save photo. Try again.', variant: 'destructive' })
-      } finally {
-        setSavingPhoto(false)
+
+    try {
+      setSavingPhoto(true)
+      const uploadData = new FormData()
+      uploadData.append('avatar', file)
+
+      const { data } = await api.updateUser(user!.id, uploadData)
+      if (data.success) {
+        setAvatarUrl(data.data.avatar)
+        updateUser(data.data)
+        toast({ title: 'Photo Updated', description: 'Profile photo saved successfully.' })
       }
+    } catch (error: any) {
+      console.error(error)
+      toast({ 
+        title: 'Save Failed', 
+        description: error.response?.data?.message || 'Could not save photo. Try again.', 
+        variant: 'destructive' 
+      })
+    } finally {
+      setSavingPhoto(false)
     }
-    reader.readAsDataURL(file)
     // Reset so same file can be selected again
     e.target.value = ''
   }
@@ -142,14 +145,14 @@ export default function Profile() {
                     <Phone className="w-5 h-5 text-primary" />
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Phone</p>
-                      <p className="text-sm font-medium text-secondary-900 dark:text-white">{formData.phone || 'Not provided'}</p>
+                      <p className="text-sm font-medium text-secondary-900 dark:text-white">{user?.phone || 'Not provided'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <MapPin className="w-5 h-5 text-primary" />
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Location</p>
-                      <p className="text-sm font-medium text-secondary-900 dark:text-white">{formData.location || 'Not provided'}</p>
+                      <p className="text-sm font-medium text-secondary-900 dark:text-white">{user?.location || 'Not provided'}</p>
                     </div>
                   </div>
                 </div>
@@ -165,24 +168,48 @@ export default function Profile() {
             ) : (
               <>
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Name</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="input-base"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Name</label>
+                      <input
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="input-base"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Email</label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="input-base"
+                        disabled
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Email</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="input-base"
-                      disabled
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Phone</label>
+                      <input
+                        type="text"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="input-base"
+                        placeholder="e.g. +1 (555) 0199"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Location</label>
+                      <input
+                        type="text"
+                        value={formData.location}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                        className="input-base"
+                        placeholder="e.g. San Francisco, CA"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-secondary-900 dark:text-white mb-1">Bio</label>
@@ -191,6 +218,7 @@ export default function Profile() {
                       onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                       className="input-base"
                       rows={3}
+                      placeholder="Tell us about yourself..."
                     />
                   </div>
                 </div>
@@ -207,8 +235,8 @@ export default function Profile() {
                         name: user?.name || '',
                         email: user?.email || '',
                         role: user?.role || '',
-                        phone: '',
-                        location: '',
+                        phone: user?.phone || '',
+                        location: user?.location || '',
                         bio: user?.bio || '',
                       })
                     }}

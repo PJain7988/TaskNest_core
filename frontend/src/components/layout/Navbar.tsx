@@ -75,8 +75,12 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-secondary-700 rounded-lg transition-smooth"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-primary flex-center text-white text-sm font-semibold">
-                {userInitials}
+              <div className="w-8 h-8 rounded-full bg-gradient-primary flex-center text-white text-sm font-semibold overflow-hidden">
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+                ) : (
+                  userInitials
+                )}
               </div>
             </button>
 

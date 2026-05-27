@@ -57,11 +57,17 @@ export const api = {
 
   // Users
   getUsers: () => axiosInstance.get('/users'),
-  updateUser: (id: string, data: any) => axiosInstance.put(`/users/${id}`, data),
+  updateUser: (id: string, data: any) => 
+    axiosInstance.put(`/users/${id}`, data, data instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : undefined),
   deleteUser: (id: string) => axiosInstance.delete(`/users/${id}`),
   updateSettings: (data: any) => axiosInstance.put('/users/settings', data),
   setup2FA: () => axiosInstance.post('/users/2fa/setup'),
   verify2FA: (token: string) => axiosInstance.post('/users/2fa/verify', { token }),
+
+  // AI Copilot
+  summarizeProject: (projectId: string) => axiosInstance.get(`/ai/summarize/${projectId}`),
+  generateTasks: (data: any) => axiosInstance.post('/ai/generate-tasks', data),
+  chatCopilot: (data: any) => axiosInstance.post('/ai/chat', data),
 }
 
 export default axiosInstance

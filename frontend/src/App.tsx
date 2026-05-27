@@ -10,6 +10,7 @@ import Chat from '@/pages/chat/Chat'
 import Profile from '@/pages/profile/Profile'
 import Settings from '@/pages/settings/Settings'
 import Notifications from '@/pages/notifications/Notifications'
+import AICopilot from '@/pages/ai-copilot/AICopilot'
 import NotFound from '@/pages/NotFound'
 
 const queryClient = new QueryClient({
@@ -57,6 +58,7 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/ai-copilot" element={<AICopilot />} />
                   <Route path="/404" element={<NotFound />} />
                   <Route path="*" element={<Navigate to="/404" replace />} />
                 </Route>

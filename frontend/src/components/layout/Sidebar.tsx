@@ -5,6 +5,7 @@ import {
   CheckSquare,
   Users,
   MessageCircle,
+  Sparkles,
   Settings,
   LogOut,
   ChevronRight,
@@ -21,6 +22,7 @@ const menuItems = [
   { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
   { icon: Users, label: 'Team', path: '/team' },
   { icon: MessageCircle, label: 'Messages', path: '/chat' },
+  { icon: Sparkles, label: 'AICopilot', path: '/ai-copilot' },
 ]
 
 const secondaryItems = [
@@ -126,9 +128,18 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
           </div>
 
           {/* Profile card */}
-          <div className="mt-4 p-4 bg-white/10 rounded-lg">
-            <p className="text-xs text-white/70">{t('loggedAs')}</p>
-            <p className="font-semibold text-sm">{user?.name || 'Guest'}</p>
+          <div className="mt-6 p-4 bg-white/10 dark:bg-black/20 rounded-2xl border border-white/5 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/20 flex-center text-white font-bold overflow-hidden shrink-0">
+              {user?.avatar ? (
+                <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+              ) : (
+                user?.name?.charAt(0).toUpperCase() || 'U'
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-sm truncate leading-snug">{user?.name || 'Guest'}</p>
+              <p className="text-xs text-white/60 truncate capitalize leading-tight">{user?.role || 'Member'}</p>
+            </div>
           </div>
         </div>
       </aside>

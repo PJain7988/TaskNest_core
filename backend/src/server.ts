@@ -66,6 +66,7 @@ app.use(`${API_PREFIX}/auth`, authRoutes)
 app.use(`${API_PREFIX}/projects`, protect, require('./routes/projects.routes').default)
 app.use(`${API_PREFIX}/tasks`, protect, require('./routes/tasks.routes').default)
 app.use(`${API_PREFIX}/users`, protect, require('./routes/users.routes').default)
+app.use(`${API_PREFIX}/ai`, protect, require('./routes/ai.routes').default)
 
 // 404 handler
 app.use((req: Request, res: Response) => {

@@ -7,6 +7,9 @@ export interface IUser extends Document {
   password: string
   role: 'admin' | 'manager' | 'user'
   avatar?: string
+  bio?: string
+  phone?: string
+  location?: string
   notificationSettings: {
     email: boolean
     push: boolean
@@ -31,6 +34,9 @@ const userSchema = new Schema<IUser>(
     password: { type: String, required: true, minlength: 6 },
     role: { type: String, enum: ['admin', 'manager', 'user'], default: 'user' },
     avatar: { type: String },
+    bio: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    location: { type: String, default: '' },
     notificationSettings: {
       email: { type: Boolean, default: true },
       push: { type: Boolean, default: true },
