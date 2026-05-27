@@ -3,6 +3,7 @@ import User from '../models/User'
 import bcrypt from 'bcryptjs'
 import speakeasy from 'speakeasy'
 import QRCode from 'qrcode'
+import { uploadToS3 } from '../utils/upload'
 
 export const getUsers = async (req: Request, res: Response) => {
   const users = await User.find().select('-password')
@@ -10,16 +11,29 @@ export const getUsers = async (req: Request, res: Response) => {
 }
 
 export const updateUser = async (req: any, res: Response) => {
-  const user = await User.findByIdAndUpdate(req.params.id || req.user.id, req.body, {
-    new: true,
-    runValidators: true,
-  }).select('-password')
+  try {
+    let updateData = { ...req.body }
 
-  if (!user) {
-    return res.status(404).json({ success: false, message: 'User not found' })
+    // Handle avatar file upload
+    if (req.file) {
+      const avatarUrl = await uploadToS3(req.file)
+      updateData.avatar = avatarUrl
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id || req.user.id, updateData, {
+      new: true,
+      runValidators: true,
+    }).select('-password')
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' })
+    }
+
+    res.json({ success: true, data: user })
+  } catch (error: any) {
+    console.error('Update user error:', error)
+    res.status(400).json({ success: false, message: error.message || 'Update failed' })
   }
-
-  res.json({ success: true, data: user })
 }
 
 export const updatePassword = async (req: any, res: Response) => {

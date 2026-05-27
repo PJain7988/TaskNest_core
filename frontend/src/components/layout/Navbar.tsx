@@ -9,6 +9,7 @@ interface NavbarProps {
 
 export default function Navbar({ toggleSidebar }: NavbarProps) {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 

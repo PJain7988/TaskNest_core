@@ -27,6 +27,8 @@ import { ThemeProvider } from './context/ThemeContext'
 import ProtectedRoute from './components/layout/ProtectedRoute'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
 import AuthLayout from './components/layout/AuthLayout'
 
 function App() {
@@ -40,6 +42,8 @@ function App() {
               <Route element={<AuthLayout />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password/:token" element={<ResetPassword />} />
               </Route>
   
               {/* Protected Routes */}
