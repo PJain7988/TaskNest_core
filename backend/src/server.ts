@@ -19,9 +19,14 @@ connectDB()
 
 const app: Express = express()
 const httpServer = createServer(app)
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',') 
-  : [process.env.CLIENT_URL || 'http://localhost:5173']
+const baseOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://task-nest-core-frontend.vercel.app'
+]
+const envOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : []
+const clientUrl = process.env.CLIENT_URL ? [process.env.CLIENT_URL.trim()] : []
+const allowedOrigins = Array.from(new Set([...baseOrigins, ...envOrigins, ...clientUrl]))
 
 const io = new SocketIOServer(httpServer, {
   cors: {
