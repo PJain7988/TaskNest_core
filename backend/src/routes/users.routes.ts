@@ -12,7 +12,7 @@ router.put('/settings', updateSettings)
 router.put('/password', updatePassword)
 router.post('/2fa/setup', setup2FA)
 router.post('/2fa/verify', verify2FA)
-router.put('/:id', upload.single('avatar'), updateUser)
+router.put('/:id', upload.single('avatar') as any, updateUser)
 router.delete('/:id', deleteUser)
 
 export default router

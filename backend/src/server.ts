@@ -31,13 +31,13 @@ const io = new SocketIOServer(httpServer, {
 })
 
 // Middleware
-app.use(helmet())
-app.use(compression())
-app.use(morgan('dev'))
+app.use(helmet() as any)
+app.use(compression() as any)
+app.use(morgan('dev') as any)
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
-}))
+}) as any)
 
 app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ limit: '50mb', extended: true }))
@@ -47,7 +47,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
 })
-app.use('/api/', limiter)
+app.use('/api/', limiter as any)
 
 // Routes
 app.get('/api/health', (req: Request, res: Response) => {
