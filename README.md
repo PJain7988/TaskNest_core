@@ -1,5 +1,8 @@
 # TaskNest Pro 🚀
 
+**🌍 Live Frontend**: [https://task-nest-core-frontend.vercel.app/](https://task-nest-core-frontend.vercel.app/)
+**⚡ Live Backend API**: [https://tasknest-core.onrender.com](https://tasknest-core.onrender.com)
+
 A professional project management and team collaboration platform built with MERN stack (MongoDB, Express, React, Node.js) + Vite.
 
 ## ✨ Features
