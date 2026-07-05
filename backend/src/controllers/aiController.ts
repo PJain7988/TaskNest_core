@@ -76,10 +76,10 @@ export const summarizeProject = async (req: any, res: Response) => {
     const tasks = await Task.find({ project: projectId })
 
     const total = tasks.length
-    const todoTasks = tasks.filter(t => t.status === 'todo').length
-    const inProgressTasks = tasks.filter(t => t.status === 'in-progress').length
-    const reviewTasks = tasks.filter(t => t.status === 'review').length
-    const doneTasks = tasks.filter(t => t.status === 'done').length
+    const todoTasks = tasks.filter((t: any) => t.status === 'todo').length
+    const inProgressTasks = tasks.filter((t: any) => t.status === 'in-progress').length
+    const reviewTasks = tasks.filter((t: any) => t.status === 'review').length
+    const doneTasks = tasks.filter((t: any) => t.status === 'done').length
 
     const activeTasks = inProgressTasks + reviewTasks
     const completionRate = total > 0 ? Math.round((doneTasks / total) * 100) : 0
@@ -441,7 +441,7 @@ We have active work flowing smoothly across **${activeProjects.length} active de
 
 I have identified **${criticalTasks.length} active blocker(s)** that require developer review:
 
-${criticalTasks.map((t, i) => `${i + 1}. **${t.title}** (Priority: \`CRITICAL\`) - Status: \`${t.status.toUpperCase()}\``).join('\n')}
+${criticalTasks.map((t: any, i: number) => `${i + 1}. **${t.title}** (Priority: \`CRITICAL\`) - Status: \`${t.status.toUpperCase()}\``).join('\n')}
 
 I suggest reassigning team members to address these items today to keep the sprint timeline secure.`
         } else {
