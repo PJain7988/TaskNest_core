@@ -457,6 +457,7 @@ I scanned the active task queues and found **0 active critical blockers**. Every
 * **\`Team Metrics Scan\`** — Provide summaries of workflow progress, counts, and blockers.
 
 Type any message like "Give me a status update" or "Check critical blockers" to begin!`
+      }
     }
   
     res.json({

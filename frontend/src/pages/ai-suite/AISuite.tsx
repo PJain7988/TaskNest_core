@@ -13,15 +13,13 @@ import {
   AlertTriangle,
   MessageSquare,
   ShieldCheck,
-  Send,
   Loader2,
   Check,
   Info,
   Calendar,
   Layers,
   Sparkles,
-  RefreshCw,
-  Plus
+  RefreshCw
 } from 'lucide-react'
 import { api } from '@/services/api'
 import { useToast } from '@/hooks/use-toast'
