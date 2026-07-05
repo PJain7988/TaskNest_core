@@ -8,7 +8,7 @@ import { io as socketIO } from 'socket.io-client'
 
 const SOCKET_URL = import.meta.env.VITE_API_URL 
   ? import.meta.env.VITE_API_URL.replace('/api/v1', '') 
-  : 'http://localhost:5000'
+  : 'https://tasknest-core.onrender.com'
 
 const initialConversations = [
   { id: '1', name: '📢 General Channel', unread: 0, lastMessage: 'Welcome to the collaborative space!' },
