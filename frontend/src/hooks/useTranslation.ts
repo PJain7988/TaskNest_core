@@ -23,6 +23,7 @@ const translations: Record<string, Record<string, string>> = {
     projectVelocity: 'Project Velocity',
     searchPlaceholder: 'Search projects, tasks...',
     security: 'Security',
+    'ai suite': 'AI Suite',
   },
   es: {
     dashboard: 'Tablero',
@@ -46,6 +47,7 @@ const translations: Record<string, Record<string, string>> = {
     projectVelocity: 'Velocidad del Proyecto',
     searchPlaceholder: 'Buscar proyectos, tareas...',
     security: 'Seguridad',
+    'ai suite': 'Módulo de IA',
   },
   fr: {
     dashboard: 'Tableau de bord',
@@ -69,6 +71,7 @@ const translations: Record<string, Record<string, string>> = {
     projectVelocity: 'Vélocité du Projet',
     searchPlaceholder: 'Rechercher des projets, des tâches...',
     security: 'Sécurité',
+    'ai suite': 'Suite IA',
   },
   de: {
     dashboard: 'Dashboard',
@@ -92,6 +95,7 @@ const translations: Record<string, Record<string, string>> = {
     projectVelocity: 'Projektgeschwindigkeit',
     searchPlaceholder: 'Suchen Sie nach Projekten, Aufgaben...',
     security: 'Sicherheit',
+    'ai suite': 'KI-Suite',
   }
 }
 

@@ -9,6 +9,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Brain,
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -23,6 +24,7 @@ const menuItems = [
   { icon: Users, label: 'Team', path: '/team' },
   { icon: MessageCircle, label: 'Messages', path: '/chat' },
   { icon: Sparkles, label: 'AICopilot', path: '/ai-copilot' },
+  { icon: Brain, label: 'AI Suite', path: '/ai-suite' },
 ]
 
 const secondaryItems = [

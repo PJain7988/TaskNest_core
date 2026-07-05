@@ -68,6 +68,7 @@ export const api = {
   summarizeProject: (projectId: string) => axiosInstance.get(`/ai/summarize/${projectId}`),
   generateTasks: (data: any) => axiosInstance.post('/ai/generate-tasks', data),
   chatCopilot: (data: any) => axiosInstance.post('/ai/chat', data),
+  executeAISuite: (data: any) => axiosInstance.post('/ai/suite/execute', data),
 }
 
 export default axiosInstance
