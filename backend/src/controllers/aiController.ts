@@ -48,10 +48,10 @@ Based on our real-time workspace scan, here is a professional diagnostic of your
 * **Closed Velocity:** **${stats.doneTasks}** completed items in Done
 
 #### 🚨 Risk Assessment & Bottlenecks
-${bottlenecks.length > 0 
-  ? bottlenecks.map(b => `* ⚠️ **Bottleneck identified:** ${b}`).join('\n')
-  : `* ✅ **Excellent Work!** No critical bottlenecks, high-priority blocks, or immediate high-risk delays are currently detected.`
-}
+${bottlenecks.length > 0
+      ? bottlenecks.map(b => `* ⚠️ **Bottleneck identified:** ${b}`).join('\n')
+      : `* ✅ **Excellent Work!** No critical bottlenecks, high-priority blocks, or immediate high-risk delays are currently detected.`
+    }
 
 #### 🎯 Strategic Recommendations
 ${recommendations.map((r, i) => `${i + 1}. **${r}**`).join('\n')}
@@ -459,7 +459,7 @@ I scanned the active task queues and found **0 active critical blockers**. Every
 Type any message like "Give me a status update" or "Check critical blockers" to begin!`
       }
     }
-  
+
     res.json({
       success: true,
       data: {
@@ -486,7 +486,7 @@ export const executeAISuite = async (req: any, res: Response) => {
     if (projectKey === 'social_media') {
       const { handle, platforms = ['Twitter'] } = params
       if (!handle) throw new Error('Social media handle is required')
-      
+
       if (apiKey) {
         try {
           const prompt = `You are a Social Media Analyzer AI. Analyze public presence for handle "${handle}" on platforms: ${platforms.join(', ')}.
@@ -505,7 +505,7 @@ Output ONLY raw valid JSON. No markdown ticks. Make it match the JSON schema per
           console.error('Gemini error, using fallback...', e)
         }
       }
-      
+
       if (!result.reputationScore) {
         const seed = handle.length
         const positive = Math.max(30, Math.min(85, 45 + (seed % 35)))
@@ -517,7 +517,7 @@ Output ONLY raw valid JSON. No markdown ticks. Make it match the JSON schema per
           reputationScore,
           riskCategory,
           sentiment: { positive, neutral, negative },
-          ethicalConcerns: reputationScore < 60 
+          ethicalConcerns: reputationScore < 60
             ? ['Polarizing arguments in public forums', 'High frequency of late-night controversial posting']
             : ['No critical ethical flags detected', 'Professional digital footprint verified'],
           summary: `### 🔍 Digital Brand Reputation Audit: **${handle}**
@@ -598,14 +598,14 @@ Output ONLY raw valid JSON.`
         const isHigh = symptoms.toLowerCase().includes('chest') || symptoms.toLowerCase().includes('breath') || symptoms.toLowerCase().includes('numb')
         result = {
           riskLevel: isHigh ? 'High' : 'Moderate',
-          possibleDiagnoses: isHigh 
-            ? [ { disease: 'Acute Coronary Syndrome', probability: 45 }, { disease: 'Severe GERD', probability: 30 }, { disease: 'Intercostal Neuralgia', probability: 25 } ]
-            : [ { disease: 'Acute Viral Rhinitis', probability: 70 }, { disease: 'Allergic Sinusitis', probability: 30 } ],
+          possibleDiagnoses: isHigh
+            ? [{ disease: 'Acute Coronary Syndrome', probability: 45 }, { disease: 'Severe GERD', probability: 30 }, { disease: 'Intercostal Neuralgia', probability: 25 }]
+            : [{ disease: 'Acute Viral Rhinitis', probability: 70 }, { disease: 'Allergic Sinusitis', probability: 30 }],
           explanation: `### 🩺 Clinical Analysis Report
 The presenting symptoms ("${symptoms}") combined with a patient history of "${history}" indicates a **${isHigh ? 'High' : 'Moderate'} Risk** condition. 
 * Cardiovascular and respiratory pathways should be prioritized for diagnostic scans to rule out critical complications.
 * Diagnostic markers indicate active response, possibly secondary to micro-inflammatory triggers.`,
-          recommendedSteps: isHigh 
+          recommendedSteps: isHigh
             ? ['Immediate 12-lead Electrocardiogram (ECG)', 'Check serum Troponin-I and CK-MB levels', 'Refer to emergency department for monitoring']
             : ['Increase oral hydration', 'Symptomatic therapy with antihistamines', 'Rest and review if symptoms persist > 72 hours']
         }
@@ -637,9 +637,9 @@ Output ONLY raw valid JSON.`
         const isAcidic = pH < 6.0
         const isDry = weather.toLowerCase().includes('dry') || weather.toLowerCase().includes('hot')
         result = {
-          cropRecommendations: isAcidic 
-            ? [ { crop: 'Blueberries', feasibilityPercentage: 90, reason: 'Highly suited to acidic soil profiles (pH < 6.0).' }, { crop: 'Potatoes', feasibilityPercentage: 80, reason: 'Tolerates acidic and moderately sandy compositions.' } ]
-            : [ { crop: 'Maize/Corn', feasibilityPercentage: 85, reason: 'Ideal for neutral pH with moderate nitrogen enrichment.' }, { crop: 'Soybeans', feasibilityPercentage: 75, reason: 'Good matching for current Potassium (K) levels.' } ],
+          cropRecommendations: isAcidic
+            ? [{ crop: 'Blueberries', feasibilityPercentage: 90, reason: 'Highly suited to acidic soil profiles (pH < 6.0).' }, { crop: 'Potatoes', feasibilityPercentage: 80, reason: 'Tolerates acidic and moderately sandy compositions.' }]
+            : [{ crop: 'Maize/Corn', feasibilityPercentage: 85, reason: 'Ideal for neutral pH with moderate nitrogen enrichment.' }, { crop: 'Soybeans', feasibilityPercentage: 75, reason: 'Good matching for current Potassium (K) levels.' }],
           wateringSchedule: isDry ? 'Deep irrigation every 3 days in early morning.' : 'Drip irrigation for 30 mins every alternate day.',
           fertilizerPlan: `Apply nitrogen-rich fertilizer (e.g. Urea) at seedling stage. Target Phosphorus supplements in week 4.`,
           yieldEstimation: `+${Math.round(10 + (n % 15))}% growth acceleration predicted based on climate-soil matching.`
@@ -692,7 +692,7 @@ Output ONLY raw valid JSON.`
               message: `Approved. Order volume of ${restockQty} units fits perfectly within working capital constraints and yields a bulk purchasing margin benefit.`
             }
           ],
-          finalDecision: restockQty > 0 
+          finalDecision: restockQty > 0
             ? `Procure ${restockQty} units of ${productCategory} to secure inventory buffer.`
             : `Hold procurement. Current stock levels are optimal for forecasted sales.`
         }
@@ -763,7 +763,7 @@ For a **${size} sq ft ${roomType}** styled in **${theme}**:
 1. **Focal Point Integration:** Align main seating/work surface along the primary light shaft.
 2. **Traffic Flow:** Ensure a clear 3ft corridor through high-traffic pathways.
 3. **Zoning:** Leverage smart rugs and dual-level lighting to distinguish task areas from rest zones.`,
-          colorPalette: theme.toLowerCase().includes('modern') 
+          colorPalette: theme.toLowerCase().includes('modern')
             ? ['#F8FAFC', '#E2E8F0', '#475569', '#0F172A']
             : ['#FDF8F5', '#F5E8C7', '#8E806A', '#3C2C20'],
           furnitureItems: ['Low-profile floating credenza', 'Modular L-shape linen sofa', 'Integrated workspace desk', 'Statement brass floor lamp'],
@@ -795,31 +795,31 @@ Output ONLY raw valid JSON.`
       }
 
       if (!result.smartContractAddress) {
-        const contractHash = '0x' + Array.from({length: 40}, () => Math.floor(Math.random()*16).toString(16)).join('')
+        const contractHash = '0x' + Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join('')
         result = {
           smartContractAddress: contractHash,
           chainOfCustody: [
             {
               timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toLocaleString(),
               node: origin,
-              transactionHash: '0xabc' + Math.floor(100000 + Math.random()*900000),
+              transactionHash: '0xabc' + Math.floor(100000 + Math.random() * 900000),
               state: 'Origin Dispatch Certified & Sealed'
             },
             {
               timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toLocaleString(),
               node: nodes || 'Midpoint Hub',
-              transactionHash: '0xdef' + Math.floor(100000 + Math.random()*900000),
+              transactionHash: '0xdef' + Math.floor(100000 + Math.random() * 900000),
               state: 'Transit Customs Check & Integrity Clearance'
             },
             {
               timestamp: new Date().toLocaleString(),
               node: 'In-Transit to ' + destination,
-              transactionHash: '0xghi' + Math.floor(100000 + Math.random()*900000),
+              transactionHash: '0xghi' + Math.floor(100000 + Math.random() * 900000),
               state: 'GPS Geo-location Verified within Range'
             }
           ],
           risks: ['Severe weather conditions along sea corridor may prompt a 12-hour reroute', 'Minor humidity threshold variance recorded (+1.5%) in container sensors'],
-          authenticityCertificate: `CERTIFICATE-SHA256: ${Array.from({length: 24}, () => Math.floor(Math.random()*16).toString(16)).join('')}`
+          authenticityCertificate: `CERTIFICATE-SHA256: ${Array.from({ length: 24 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
         }
       }
     }
@@ -851,7 +851,7 @@ Output ONLY raw valid JSON.`
         const riskCategory = highBP ? 'High Risk' : (lowO2 || heartRate > 105) ? 'Moderate Risk' : 'Normal'
         result = {
           riskCategory,
-          complications: highBP 
+          complications: highBP
             ? ['Gestational Hypertension / Potential Pre-eclampsia warning', 'Microvascular placenta perfusion load']
             : riskCategory === 'Moderate Risk' ? ['Cardiovascular compensation', 'Mild hypoxia risk'] : ['None detected'],
           advisoryReport: `### 🤰 Clinical Vitals Diagnostic Report
@@ -894,7 +894,7 @@ Output ONLY raw valid JSON.`
         result = {
           severity,
           estimatedCost: isCritical ? 1200 : 450,
-          requiredMaterials: isCritical 
+          requiredMaterials: isCritical
             ? ['High-grade rapid asphalt mix', 'Tack coat binder compound', 'Pavement compaction roller']
             : ['Cement polymer mortar', 'Surface sealant coating'],
           repairSchedule: isCritical ? 'Emergency dispatch scheduled within 24 hours' : 'Standard dispatch in 5-7 business days',
@@ -928,7 +928,7 @@ Output ONLY raw valid JSON.`
           estimatedHours: 8,
           dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         })
-        
+
         result.taskScheduled = {
           taskId: task._id,
           projectTitle: project.name,
