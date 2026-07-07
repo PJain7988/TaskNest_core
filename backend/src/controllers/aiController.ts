@@ -10,7 +10,7 @@ export const callGemini = async (prompt: string, mimeType: string = 'text/plain'
   const response = await groq.chat.completions.create({
     messages: [{ role: 'user', content: prompt }],
     model: 'llama3-70b-8192',
-    response_format: asJson ? { type: 'json_object' } : { type: 'text' }
+    response_format: asJson ? { type: 'json_object' } : undefined
   })
   return response.choices[0]?.message?.content || ''
 }
@@ -34,17 +34,17 @@ Progress: ${completedTasks}/${totalTasks} tasks completed.
 Please provide a concise, professional summary of the project's current state and recommend 2 next steps.`
 
     const summary = await callGemini(prompt)
-    res.json({ summary })
+    res.json({ success: true, data: { summary } })
   } catch (error) {
     console.error('AI Summarize Error:', error)
-    res.status(500).json({ message: 'Failed to generate summary' })
+    res.status(500).json({ success: false, message: 'Failed to generate summary' })
   }
 }
 
 export const generateTasks = async (req: Request, res: Response) => {
   try {
     const { projectDescription } = req.body
-    if (!projectDescription) return res.status(400).json({ message: 'Project description is required' })
+    if (!projectDescription) return res.status(400).json({ success: false, message: 'Project description is required' })
 
     let prompt = `Based on this project description, generate 3-5 logical tasks.
 Description: "${projectDescription}"
@@ -57,34 +57,34 @@ Output ONLY valid JSON.`
     try {
       const parsedTasks = JSON.parse(result)
       if (Array.isArray(parsedTasks)) {
-        res.json({ tasks: parsedTasks })
+        res.json({ success: true, data: { tasks: parsedTasks } })
       } else {
-        res.json({ tasks: parsedTasks.tasks || [] })
+        res.json({ success: true, data: { tasks: parsedTasks.tasks || [] } })
       }
     } catch (e) {
       console.log('Failed to parse AI response as JSON:', result)
-      res.json({ tasks: [] })
+      res.json({ success: true, data: { tasks: [] } })
     }
   } catch (error) {
     console.error('AI Task Generation Error:', error)
-    res.status(500).json({ message: 'Failed to generate tasks' })
+    res.status(500).json({ success: false, message: 'Failed to generate tasks' })
   }
 }
 
 export const chatCopilot = async (req: Request, res: Response) => {
   try {
     const { message } = req.body
-    if (!message) return res.status(400).json({ message: 'Message is required' })
+    if (!message) return res.status(400).json({ success: false, message: 'Message is required' })
 
     let prompt = `You are the TaskNest AI Copilot, a helpful assistant for project management.
 User: ${message}
 Copilot:`
 
     const reply = await callGemini(prompt)
-    res.json({ reply })
+    res.json({ success: true, data: { reply } })
   } catch (error) {
     console.error('AI Chat Error:', error)
-    res.status(500).json({ message: 'AI chat failed' })
+    res.status(500).json({ success: false, message: 'AI chat failed' })
   }
 }
 
