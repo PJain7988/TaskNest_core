@@ -451,6 +451,8 @@ I scanned the active task queues and found **0 active critical blockers**. Every
 * **\`Team Metrics Scan\`** — Provide summaries of workflow progress, counts, and blockers.
 
 Type any message like "Give me a status update" or "Check critical blockers" to begin!`
+      } else {
+        aiResponse = `I'm currently running in offline mock mode since a valid Gemini API key was not detected. I couldn't understand that command, but you can try asking about "**status**", "**projects**", or "**blockers**" for a local offline response!`
       }
     }
 
