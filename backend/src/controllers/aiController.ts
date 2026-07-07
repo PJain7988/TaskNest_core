@@ -18,7 +18,7 @@ const callGemini = async (prompt: string, mimeType?: string): Promise<string> =>
     generationConfig.responseMimeType = mimeType
   }
   
-  const modelName = process.env.GEMINI_MODEL_NAME || 'gemini-1.5-flash';
+  const modelName = process.env.GEMINI_MODEL_NAME || 'deep-research-max-preview-04-2026';
   const model = genAI.getGenerativeModel({ model: modelName, generationConfig })
   const result = await model.generateContent(prompt)
   const text = result.response.text()
