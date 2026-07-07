@@ -3,29 +3,25 @@ import Project from '../models/Project'
 import Task from '../models/Task'
 import User from '../models/User'
 import mongoose from 'mongoose'
-import axios from 'axios'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-// Helper to query the live Gemini API using axios
-const callGemini = async (prompt: string): Promise<string> => {
+// Helper to query the live Gemini API using official SDK
+const callGemini = async (prompt: string, mimeType?: string): Promise<string> => {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not defined')
   }
 
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
-  const response = await axios.post(endpoint, {
-    contents: [
-      {
-        parts: [
-          {
-            text: prompt
-          }
-        ]
-      }
-    ]
-  })
-
-  const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text
+  const genAI = new GoogleGenerativeAI(apiKey)
+  const generationConfig: any = {}
+  if (mimeType) {
+    generationConfig.responseMimeType = mimeType
+  }
+  
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', generationConfig })
+  const result = await model.generateContent(prompt)
+  const text = result.response.text()
+  
   if (!text) {
     throw new Error('Invalid response from Gemini API')
   }
@@ -195,10 +191,8 @@ Please return the output as a valid JSON array of tasks, where each task object 
 
 Output ONLY the raw JSON array. Do not include markdown code block syntax (like \`\`\`json).
 `
-        const reply = await callGemini(geminiPrompt)
-        // Clean markdown backticks if returned by the LLM
-        const cleanedReply = reply.replace(/```json/g, '').replace(/```/g, '').trim()
-        suggestedTasks = JSON.parse(cleanedReply)
+        const reply = await callGemini(geminiPrompt, 'application/json')
+        suggestedTasks = JSON.parse(reply.trim())
       } catch (err) {
         console.error('Gemini API task generator failed, running fallback...', err)
       }
@@ -499,8 +493,8 @@ Return a JSON object containing:
   "summary": "string"
 }
 Output ONLY raw valid JSON. No markdown ticks. Make it match the JSON schema perfectly.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error('Gemini error, using fallback...', e)
         }
@@ -546,8 +540,8 @@ Return a JSON object containing:
   "finalDecision": string
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
@@ -587,8 +581,8 @@ Return a JSON object containing:
   "recommendedSteps": string[]
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
@@ -626,8 +620,8 @@ Return a JSON object containing:
   "yieldEstimation": string
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
@@ -662,8 +656,8 @@ Return a JSON object containing:
   "finalDecision": string
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
@@ -749,8 +743,8 @@ Return a JSON object containing:
   "lightingRecommendations": string
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
@@ -787,8 +781,8 @@ Return a JSON object containing:
   "authenticityCertificate": string
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
@@ -838,8 +832,8 @@ Return a JSON object containing:
   "criticalAlert": boolean
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
@@ -881,8 +875,8 @@ Return a JSON object containing:
   "suggestedTaskDescription": string
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
@@ -954,8 +948,8 @@ Return a JSON object containing:
   "aiDescription": string
 }
 Output ONLY raw valid JSON.`
-          const raw = await callGemini(prompt)
-          result = JSON.parse(raw.replace(/```json/g, '').replace(/```/g, '').trim())
+          const raw = await callGemini(prompt, 'application/json')
+          result = JSON.parse(raw.trim())
         } catch (e) {
           console.error(e)
         }
