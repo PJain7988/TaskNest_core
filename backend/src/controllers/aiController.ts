@@ -362,9 +362,10 @@ export const chatCopilot = async (req: any, res: Response) => {
     const criticalTasks = await Task.find({ priority: 'critical', status: { $ne: 'done' } })
     const activeProjects = await Project.find({ status: 'in-progress' }).limit(3)
 
+    let apiErrorMsg = ''
     const apiKey = process.env.GEMINI_API_KEY
 
-    if (apiKey) {
+    if (apiKey && apiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
       try {
         const geminiPrompt = `
 You are the TaskNest Gemini Copilot, a highly advanced project management AI.
@@ -381,8 +382,9 @@ User's message: "${message}"
 Please provide a highly professional, helpful, context-aware reply using Markdown. Keep the tone intelligent, helpful, and concise. Address the user by their name (${req.user.name}).
 `
         aiResponse = await callGemini(geminiPrompt)
-      } catch (err) {
+      } catch (err: any) {
         console.error('Gemini API chat failed, using local fallback...', err)
+        apiErrorMsg = err.message || 'Unknown API Error'
       }
     }
 
@@ -452,7 +454,11 @@ I scanned the active task queues and found **0 active critical blockers**. Every
 
 Type any message like "Give me a status update" or "Check critical blockers" to begin!`
       } else {
-        aiResponse = `I'm currently running in offline mock mode since a valid Gemini API key was not detected. I couldn't understand that command, but you can try asking about "**status**", "**projects**", or "**blockers**" for a local offline response!`
+        if (apiErrorMsg) {
+          aiResponse = `⚠️ **Gemini API Error:** I tried to connect to the AI, but the request failed with error: \`${apiErrorMsg}\`.\n\nPlease check your live deployment's Environment Variables and ensure the API key is fully valid.`
+        } else {
+          aiResponse = `I'm currently running in offline mock mode since a valid Gemini API key was not detected. I couldn't understand that command, but you can try asking about "**status**", "**projects**", or "**blockers**" for a local offline response!`
+        }
       }
     }
 
