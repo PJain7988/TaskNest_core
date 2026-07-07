@@ -23,19 +23,19 @@
 }
 
 .dark {
-  --border: 213 14% 15%;
-  --input: 213 14% 15%;
+  --border: 224 14% 15%;
+  --input: 224 14% 15%;
   --ring: 263 70% 50%;
-  --background: 213 14% 8%;
+  --background: 222 47% 4%;
   --foreground: 210 40% 98%;
   
-  --primary: 79 70 229;
+  --primary: 235 86% 65%;
   --primary-foreground: 210 40% 98%;
-  --secondary: 213 13% 85%;
-  --secondary-foreground: 213 13% 15%;
+  --secondary: 222 47% 10%;
+  --secondary-foreground: 210 40% 98%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 210 40% 98%;
-  --muted: 213 14% 35%;
+  --muted: 224 14% 15%;
   --muted-foreground: 213 10% 64%;
   --accent: 245 158 11;
   --accent-foreground: 213 13% 23%;
@@ -148,7 +148,11 @@ html {
 
   /* Glass morphism */
   .glass {
-    @apply backdrop-blur-md bg-white/30 dark:bg-black/30 border border-white/20;
+    @apply backdrop-blur-xl bg-white/40 dark:bg-[#030712]/60 border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)];
+  }
+  
+  .glass-panel {
+    @apply backdrop-blur-2xl bg-white/60 dark:bg-[#030712]/80 border border-white/20 dark:border-white/5 shadow-2xl rounded-2xl;
   }
 
   /* Loading skeleton */
