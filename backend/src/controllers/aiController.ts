@@ -82,9 +82,9 @@ Copilot:`
 
     const reply = await callGemini(prompt)
     res.json({ success: true, data: { reply } })
-  } catch (error) {
-    console.error('AI Chat Error:', error)
-    res.status(500).json({ success: false, message: 'AI chat failed' })
+  } catch (error: any) {
+    console.error('AI Chat Error:', error.message)
+    res.status(500).json({ success: false, message: error.message || 'AI chat failed' })
   }
 }
 

@@ -84,9 +84,10 @@ export default function AICopilot() {
         }])
       }
     } catch (err: any) {
+      const backendError = err.response?.data?.message || err.message || 'Unknown backend failure'
       setChatLog(prev => [...prev, { 
         sender: 'ai', 
-        text: '❌ **System Error:** Failed to establish backend LLM connection. Please verify server integrity.', 
+        text: `❌ **Backend Rejected Request:** \`${backendError}\`\n\nPlease double check your Environment Variables in Render.`, 
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
       }])
     } finally {
