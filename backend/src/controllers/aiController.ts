@@ -9,7 +9,7 @@ export const callGemini = async (prompt: string, mimeType: string = 'text/plain'
   const asJson = mimeType === 'application/json'
   const response = await groq.chat.completions.create({
     messages: [{ role: 'user', content: prompt }],
-    model: 'llama3-70b-8192',
+    model: 'llama-3.3-70b-versatile',
     response_format: asJson ? { type: 'json_object' } : undefined
   })
   return response.choices[0]?.message?.content || ''
